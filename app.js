@@ -45,3 +45,4 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
         peersEl.appendChild(ul); //setting the list to the peers El
     });
 });
+
