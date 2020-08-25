@@ -38,7 +38,7 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
             const button = document.createElement('button');
             button.innerText = peerID; //making buttons of the ID
             button.classList.add("connect-button"); //well..
-            button.classList.add(`peerID-${peerID}`) //adding a PeerID to the class
+            button.classList.add(`peerID-${peerID}`); //adding a PeerID to the class
             li.appendChild(button);//adding the button to the list element
             ul.appendChild(li);//adding the list-element to the ul.
         });
