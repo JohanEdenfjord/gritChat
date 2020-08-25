@@ -22,6 +22,7 @@ const peer = new Peer(myPeerID, {
 peer.on('open', peerOnOpen);
 peer.on('error', peerOnError);
 
+//find and select where we will work to list out the other connected people!
 document.querySelector('.list-all-peers-button').addEventListener('click', () => {
 
     peer.listAllPeers((peers) => {
