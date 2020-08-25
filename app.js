@@ -26,19 +26,21 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
 
     peer.listAllPeers((peers) => {
 
-        const peersEl = document.querySelector('.peers');        
-        const ul = document.createElement('ul');
+        const peersEl = document.querySelector('.peers'); //decides where to put the peers-list   
+        const ul = document.createElement('ul'); //create a unordered list!
 
         peers
         .filter(
-            (p) => p !== myPeerID) //tenerary
+            (p) => p !== myPeerID) //tenerary to filter out your own id!
         .forEach(peerID => {
             const li = document.createElement('li');
-
-            li.innerText = peerID
-            ul.appendChild(li)
+            const button = document.createElement('button');
+            button.innerText = peerID; //making buttons of the ID
+            button.classList.add("connect-button"); //well..
+            button.classList.add(`peerID-${peerID}`) //adding a PeerID to the class
+            li.appendChild(button);//adding the button to the list element
+            ul.appendChild(li);//adding the list-element to the ul.
         });
-
-        peersEl.appendChild(ul)
+        peersEl.appendChild(ul); //setting the list to the peers El
     });
 });
