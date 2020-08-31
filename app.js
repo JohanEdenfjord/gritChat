@@ -30,7 +30,7 @@ const connectToPeerClick = (el) => {
     let peerId = el.target.textContent;  
     const conn = peer.connect(peerId);    
     conn.on('open', () =>{
-        console.log(conn)
+        console.log("connection OPEN!")
     });
 };
 
