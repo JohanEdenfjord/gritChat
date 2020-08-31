@@ -25,12 +25,11 @@ peer = new Peer(myPeerID, {
     secure: true,
 });
 
-const connectToPeerClick = (el) => {
-    console.log(el)
-    let peerId = el.target.textContent;  
+const connectToPeerClick = (el) => {    
+    const peerId = el.target.textContent;  
     const conn = peer.connect(peerId);    
     conn.on('open', () =>{
-        console.log("connection OPEN!")
+        console.log("connection is ....OPEN!")
     });
 };
 
