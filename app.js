@@ -3,6 +3,7 @@
 
 //global variable
 let peer = null
+let conn = null
 
 
 //if there is a # in the url this puts the myPeerId where it should be!
@@ -15,7 +16,11 @@ let myPeerID = location.hash.slice(1);
 
 const peerOnError = (error) => {
     console.log(error);
-}
+};
+
+let consoleLog = (e) => {
+    console.log(e)
+};
 
 // Connections
 peer = new Peer(myPeerID, {
@@ -27,15 +32,15 @@ peer = new Peer(myPeerID, {
 
 const connectToPeerClick = (el) => {     
     const peerId = el.target.textContent;  
+    conn && conn.close();
     console.log("Atempting to Connect to " + peerId)   
-    const conn = peer.connect(peerId);    
+    conn = peer.connect(peerId);    
     conn.on('open', () =>{
         console.log("connection is ....OPEN!")
-        conn.on('data', function(data) {
-            console.log('Received', data);
-          });
-        conn.send('hello');
+        const event = new CustomEvent('peer-changed', {detail: peerId });
+        document.dispatchEvent(event);
     });
+    conn.on('error', consoleLog);
 };
 
 
@@ -49,6 +54,7 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
     peer.listAllPeers((peers) => {
 
         const peersEl = document.querySelector('.peers'); //decides where to put the peers-list   
+        peersEl.firstChild && peersEl.firstChild.remove();
         const ul = document.createElement('ul'); //create a unordered list!
 
         peers
@@ -68,4 +74,18 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
     });
 });
 
+document.addEventListener('peer-changed', (ev) => {
+    const peerId = ev.detail;
+    console.log("peer-changed: ", peerId);
+    const name = document.querySelector(".name");
+    document.querySelectorAll('.connect-button').forEach((el) => {
+        el.classList.remove("connected");
+    });
+    name.innerHTML = peerId;
+    const button = document.querySelector(`.connect-button.peerID-${peerId}`);    
+    button.classList.add('connected');
+    
+});
+
 })();
+ 
