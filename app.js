@@ -1,3 +1,9 @@
+//self invoked anonymous function!
+(function (){
+
+//global variable
+let peer = null
+
 
 //if there is a # in the url this puts the myPeerId where it should be!
 const peerOnOpen = (id) => {
@@ -5,18 +11,29 @@ const peerOnOpen = (id) => {
 };
 
 //adds an id by putting an # after the URL.
-const myPeerID = location.hash.slice(1);
+let myPeerID = location.hash.slice(1);
 
 const peerOnError = (error) => {
-    console.log(error)
+    console.log(error);
 }
-// Connecting to the peer-server!
-const peer = new Peer(myPeerID, {
+
+// Connections
+peer = new Peer(myPeerID, {
     host: "glajan.com",
     port: 8443, 
     path: '/myapp', 
     secure: true,
 });
+
+const connectToPeerClick = (el) => {
+    console.log(el)
+    let peerId = el.target.textContent;  
+    const conn = peer.connect(peerId);    
+    conn.on('open', () =>{
+        console.log(conn)
+    });
+};
+
 
 //open the connection! and handles eventual error!
 peer.on('open', peerOnOpen);
@@ -39,10 +56,11 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
             button.innerText = peerID; //making buttons of the ID
             button.classList.add("connect-button"); //well..
             button.classList.add(`peerID-${peerID}`); //adding a PeerID to the class
+            button.addEventListener("click", connectToPeerClick);
             li.appendChild(button);//adding the button to the list element
             ul.appendChild(li);//adding the list-element to the ul.
         });
         peersEl.appendChild(ul); //setting the list to the peers El
     });
 });
-
+})();
