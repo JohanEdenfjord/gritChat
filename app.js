@@ -25,13 +25,16 @@ peer = new Peer(myPeerID, {
     secure: true,
 });
 
-const connectToPeerClick = (el) => { 
-    
+const connectToPeerClick = (el) => {     
     const peerId = el.target.textContent;  
     console.log("Atempting to Connect to " + peerId)   
     const conn = peer.connect(peerId);    
     conn.on('open', () =>{
         console.log("connection is ....OPEN!")
+        conn.on('data', function(data) {
+            console.log('Received', data);
+          });
+        conn.send('hello');
     });
 };
 
@@ -64,4 +67,5 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
         peersEl.appendChild(ul); //setting the list to the peers El
     });
 });
+
 })();
