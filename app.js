@@ -25,28 +25,90 @@ let consoleLog = (e) => {
 // Connections
 peer = new Peer(myPeerID, {
     host: "glajan.com",
-    port: 8443, 
-    path: '/myapp', 
+    port: 8443,
+    path: "/myapp",
     secure: true,
-});
+    config: {
+      iceServers: [
+        { 
+            url: ["stun:eu-turn7.xirsys.com"] 
+        },
+        {
+          username:
+            "1FOoA8xKVaXLjpEXov-qcWt37kFZol89r0FA_7Uu_bX89psvi8IjK3tmEPAHf8EeAAAAAF9NXWZnbGFqYW4=",
+          credential: "83d7389e-ebc8-11ea-a8ee-0242ac140004",
+          url: "turn:eu-turn7.xirsys.com:80?transport=udp",
+        },
+      ],
+    },
+  });
 
-const connectToPeerClick = (el) => {     
+  function printMessage(message, who) {
+      const messageDiv = document.querySelector(".messages");
+      const messageWrapper = document.createElement('div');
+      const newMessageDiv = document.createElement('div');
+
+      newMessageDiv.innerText = message;
+      console.log(message);
+      messageWrapper.classList.add("message");
+      if (who === "me"){
+          messageWrapper.classList.add("me");
+          console.log("me");
+      } else if (who === "them"){
+          messageWrapper.classList.add("them");
+          console.log("them");
+      }
+      messageWrapper.appendChild(newMessageDiv);
+      messageDiv.appendChild(messageWrapper);
+  };
+
+const connectToPeerClick = (el) => {         
     const peerId = el.target.textContent;  
     conn && conn.close();
     console.log("Atempting to Connect to " + peerId)   
-    conn = peer.connect(peerId);    
+    conn = peer.connect(peerId);
+
     conn.on('open', () =>{
         console.log("connection is ....OPEN!")
-        const event = new CustomEvent('peer-changed', {detail: peerId });
+        const event = new CustomEvent('peer-changed', {detail: { peerId: peerId }});
         document.dispatchEvent(event);
+        conn.on("data", (data) => {
+            console.log(data);
+            printMessage(data, "them");
+        });
     });
     conn.on('error', consoleLog);
+};
+
+const establishedConnection = (conn) => {
+    console.log(conn)
 };
 
 
 //open the connection! and handles eventual error!
 peer.on('open', peerOnOpen);
 peer.on('error', peerOnError);
+
+peer.on("connection", (newConnection) => {
+    console.log("connection from remote peer is established!");
+    console.log(newConnection);
+    //closing previous connection
+    conn && conn.close();
+
+    //accept new Conection!
+
+    conn = newConnection;
+
+    //callback for event!
+    conn.on("data",(data) => {
+        console.log(data);
+        printMessage(data, "them")
+    });
+
+    //create peerChanged event
+    const peerChangedEvent = new CustomEvent("peer-changed", {detail: {peerId: conn.peer}});
+    document.dispatchEvent(peerChangedEvent);
+});
 
 //find and select where we will work to list out the other connected people!
 document.querySelector('.list-all-peers-button').addEventListener('click', () => {
@@ -75,7 +137,7 @@ document.querySelector('.list-all-peers-button').addEventListener('click', () =>
 });
 
 document.addEventListener('peer-changed', (ev) => {
-    const peerId = ev.detail;
+    const peerId = ev.detail.peerId;
     console.log("peer-changed: ", peerId);
     const name = document.querySelector(".name");
     document.querySelectorAll('.connect-button').forEach((el) => {
