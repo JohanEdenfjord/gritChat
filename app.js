@@ -2,8 +2,9 @@
 (function (){
 
 //global variable
-let peer = null
-let conn = null
+let peer = null;
+let conn = null;
+let messageBox = document.querySelector(".new-message");
 
 
 //if there is a # in the url this puts the myPeerId where it should be!
@@ -47,21 +48,37 @@ peer = new Peer(myPeerID, {
       const messageDiv = document.querySelector(".messages");
       const messageWrapper = document.createElement('div');
       const newMessageDiv = document.createElement('div');
-
-      newMessageDiv.innerText = message;
-      console.log(message);
+      let timestamp = new Date().toLocaleTimeString();  
+      newMessageDiv.innerText = (message + "\n" + timestamp);
+      //console.log(message);
       messageWrapper.classList.add("message");
       if (who === "me"){
           messageWrapper.classList.add("me");
-          console.log("me");
+          //console.log("me");
       } else if (who === "them"){
           messageWrapper.classList.add("them");
-          console.log("them");
+          //console.log("them");
       }
       messageWrapper.appendChild(newMessageDiv);
       messageDiv.appendChild(messageWrapper);
   };
+  
+  document.querySelector(".send-new-message-button").addEventListener("click", () => {      
+      sendTheMessage();
+    });
 
+    messageBox.addEventListener("keyup", (e) => {
+        if(e.keyCode === 13){
+            sendTheMessage();
+        }
+    });
+
+    function sendTheMessage() {
+        let message = document.querySelector(".new-message").value;
+        conn.send(message);
+        printMessage(message, "me");
+        messageBox.value= "";
+    };
 const connectToPeerClick = (el) => {         
     const peerId = el.target.textContent;  
     conn && conn.close();
@@ -78,10 +95,6 @@ const connectToPeerClick = (el) => {
         });
     });
     conn.on('error', consoleLog);
-};
-
-const establishedConnection = (conn) => {
-    console.log(conn)
 };
 
 
@@ -145,8 +158,7 @@ document.addEventListener('peer-changed', (ev) => {
     });
     name.innerHTML = peerId;
     const button = document.querySelector(`.connect-button.peerID-${peerId}`);    
-    button.classList.add('connected');
-    
+    button.classList.add('connected');    
 });
 
 })();
