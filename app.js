@@ -28,19 +28,19 @@
     port: 8443,
     path: "/myapp",
     secure: true,
-    config: {
-      iceServers: [
-        {
-          url: ["stun:eu-turn7.xirsys.com"],
-        },
-        {
-          username:
-            "1FOoA8xKVaXLjpEXov-qcWt37kFZol89r0FA_7Uu_bX89psvi8IjK3tmEPAHf8EeAAAAAF9NXWZnbGFqYW4=",
-          credential: "83d7389e-ebc8-11ea-a8ee-0242ac140004",
-          url: "turn:eu-turn7.xirsys.com:80?transport=udp",
-        },
-      ],
-    },
+    //config: {
+    //  iceServers: [
+     //   {
+     //     url: ["stun:eu-turn7.xirsys.com"],
+    //    },
+    //    {
+    //      username:
+    //        "1FOoA8xKVaXLjpEXov-qcWt37kFZol89r0FA_7Uu_bX89psvi8IjK3tmEPAHf8EeAAAAAF9NXWZnbGFqYW4=",
+    //      credential: "83d7389e-ebc8-11ea-a8ee-0242ac140004",
+    //      url: "turn:eu-turn7.xirsys.com:80?transport=udp",
+    //    },
+    //  ],
+    //},
   });
 
   function printMessage(message, who) {
@@ -100,8 +100,12 @@
     });
     conn.on("error", consoleLog);
   };
+
+
   const peerOnCall = (incommingCall) => {
-    if (confirm("answer Call?")) {
+    console.log("calling!");
+    if (confirm(`answer Call from ${incommingCall.peer}?`)) {
+      console.log("answered!");
       mediaConnection && mediaConnection.close();
       //answer incoming call! please! :D
       navigator.mediaDevices
@@ -111,7 +115,9 @@
           incommingCall.answer(myStream);
           mediaConnection.on("stream", mediaConnectionOnStream);
         });
-    };
+    } else {
+      console.log("notAnswered!");
+    }
   };
   //open the connection! and handles eventual error!
   peer.on("open", peerOnOpen);
@@ -126,7 +132,7 @@
     //closing previous connection
     conn && conn.close();
 
-    //accept new Conection!
+    //accept new Conection
 
     conn = newConnection;
 
@@ -200,6 +206,7 @@
   };
 
   const stopVideoCall = () => {
+    mediaConnection && mediaConnection.close();
     const video = document.querySelector(".video-container.them");
     const startButton = video.querySelector(".start");
     const stopButton = video.querySelector(".stop");
