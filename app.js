@@ -4,6 +4,7 @@
   let peer = null;
   let conn = null;
   let messageBox = document.querySelector(".new-message");
+  let mediaConnection = null;
 
   //if there is a # in the url this puts the myPeerId where it should be!
   const peerOnOpen = (id) => {
@@ -46,8 +47,7 @@
     const messageDiv = document.querySelector(".messages");
     const messageWrapper = document.createElement("div");
     const newMessageDiv = document.createElement("div");
-    let timestamp = new Date().toLocaleTimeString();
-    newMessageDiv.innerText = message + "\n" + timestamp;
+    newMessageDiv.innerText = message + "\n" + new Date().toLocaleTimeString();
     //console.log(message);
     messageWrapper.classList.add("message");
     if (who === "me") {
@@ -100,10 +100,25 @@
     });
     conn.on("error", consoleLog);
   };
-
+  const peerOnCall = (incommingCall) => {
+    if (confirm("answer Call?")) {
+      mediaConnection && mediaConnection.close();
+      //answer incoming call! please! :D
+      navigator.mediaDevices
+        .getUserMedia({ audio: true, video: true })
+        .then((myStream) => {
+          mediaConnection = incommingCall;
+          incommingCall.answer(myStream);
+          mediaConnection.on("stream", mediaConnectionOnStream);
+        });
+    };
+  };
   //open the connection! and handles eventual error!
   peer.on("open", peerOnOpen);
   peer.on("error", peerOnError);
+  peer.on("call", peerOnCall);
+
+  //on peer Event 'call' when we get a call!
 
   peer.on("connection", (newConnection) => {
     console.log("connection from remote peer is established!");
@@ -155,12 +170,18 @@
 
   //display video of me!
   navigator.mediaDevices
-    .getUserMedia({ audio: false, video: true })
+    .getUserMedia({ audio: true, video: true })
     .then((stream) => {
       const video = document.querySelector(".video-container.me video");
       video.muted = true;
       video.srcObject = stream;
     });
+
+  const mediaConnectionOnStream = (theirStream) => {
+    const video = document.querySelector(".video-container.them video");
+    video.muted = true;
+    video.srcObject = theirStream;
+  };
 
   const startVideoCall = () => {
     const video = document.querySelector(".video-container.them");
@@ -168,12 +189,33 @@
     const stopButton = video.querySelector(".stop");
     startButton.classList.remove("active");
     stopButton.classList.add("active");
+
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
+      .then((myStream) => {
+        mediaConnection = peer.call(conn.peer, myStream);
+        console.log(mediaConnection);
+        mediaConnection.on("stream", mediaConnectionOnStream);
+      });
+  };
+
+  const stopVideoCall = () => {
+    const video = document.querySelector(".video-container.them");
+    const startButton = video.querySelector(".start");
+    const stopButton = video.querySelector(".stop");
+    stopButton.classList.remove("active");
+    startButton.classList.add("active");
   };
 
   //start Video click handler!
   document
     .querySelector(".video-container.them .start")
     .addEventListener("click", startVideoCall);
+
+  //stop Video call Click handler!
+  document
+    .querySelector(".video-container.them .stop")
+    .addEventListener("click", stopVideoCall);
 
   document.addEventListener("peer-changed", (ev) => {
     const peerId = ev.detail.peerId;
