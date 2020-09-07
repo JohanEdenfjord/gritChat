@@ -30,8 +30,8 @@
     secure: true,
     //config: {
     //  iceServers: [
-     //   {
-     //     url: ["stun:eu-turn7.xirsys.com"],
+    //   {
+    //     url: ["stun:eu-turn7.xirsys.com"],
     //    },
     //    {
     //      username:
@@ -101,23 +101,22 @@
     conn.on("error", consoleLog);
   };
 
-
   const peerOnCall = (incommingCall) => {
     console.log("calling!");
-    if (confirm(`answer Call from ${incommingCall.peer}?`)) {
-      console.log("answered!");
-      mediaConnection && mediaConnection.close();
-      //answer incoming call! please! :D
-      navigator.mediaDevices
-        .getUserMedia({ audio: true, video: true })
-        .then((myStream) => {
-          mediaConnection = incommingCall;
-          incommingCall.answer(myStream);
-          mediaConnection.on("stream", mediaConnectionOnStream);
-        });
-    } else {
-      console.log("notAnswered!");
-    }
+    //if (confirm(`answer Call from ${incommingCall.peer}?`)) {
+    console.log("answered!");
+    mediaConnection && mediaConnection.close();
+    //answer incoming call! please! :D
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
+      .then((myStream) => {
+        mediaConnection = incommingCall;
+        incommingCall.answer(myStream);
+        mediaConnection.on("stream", mediaConnectionOnStream);
+      });
+    //} else {
+    //  console.log("notAnswered!");
+    //}
   };
   //open the connection! and handles eventual error!
   peer.on("open", peerOnOpen);
@@ -179,13 +178,13 @@
     .getUserMedia({ audio: true, video: true })
     .then((stream) => {
       const video = document.querySelector(".video-container.me video");
-      video.muted = true;
+
       video.srcObject = stream;
     });
 
   const mediaConnectionOnStream = (theirStream) => {
     const video = document.querySelector(".video-container.them video");
-    video.muted = true;
+
     video.srcObject = theirStream;
   };
 
