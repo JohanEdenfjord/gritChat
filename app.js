@@ -27,20 +27,7 @@
     host: "glajan.com",
     port: 8443,
     path: "/myapp",
-    secure: true,
-    //config: {
-    //  iceServers: [
-    //   {
-    //     url: ["stun:eu-turn7.xirsys.com"],
-    //    },
-    //    {
-    //      username:
-    //        "1FOoA8xKVaXLjpEXov-qcWt37kFZol89r0FA_7Uu_bX89psvi8IjK3tmEPAHf8EeAAAAAF9NXWZnbGFqYW4=",
-    //      credential: "83d7389e-ebc8-11ea-a8ee-0242ac140004",
-    //      url: "turn:eu-turn7.xirsys.com:80?transport=udp",
-    //    },
-    //  ],
-    //},
+    secure: true,    
   });
 
   function printMessage(message, who) {
@@ -48,14 +35,14 @@
     const messageWrapper = document.createElement("div");
     const newMessageDiv = document.createElement("div");
     newMessageDiv.innerText = message + "\n" + new Date().toLocaleTimeString();
-    //console.log(message);
+    
     messageWrapper.classList.add("message");
     if (who === "me") {
       messageWrapper.classList.add("me");
-      //console.log("me");
+      
     } else if (who === "them") {
       messageWrapper.classList.add("them");
-      //console.log("them");
+      
     }
     messageWrapper.appendChild(newMessageDiv);
     messageDiv.appendChild(messageWrapper);
@@ -76,8 +63,10 @@
 
   function sendTheMessage() {
     let message = document.querySelector(".new-message").value;
+    if(messageBox.value != ""){
     conn.send(message);
     printMessage(message, "me");
+    }
     messageBox.value = "";
   }
 
@@ -94,7 +83,7 @@
       });
       document.dispatchEvent(event);
       conn.on("data", (data) => {
-        console.log(data);
+        
         printMessage(data, "them");
       });
     });
@@ -103,7 +92,7 @@
 
   const peerOnCall = (incommingCall) => {
     console.log("calling!");
-    //if (confirm(`answer Call from ${incommingCall.peer}?`)) {
+    
     console.log("answered!");
     mediaConnection && mediaConnection.close();
     //answer incoming call! please! :D
@@ -113,10 +102,7 @@
         mediaConnection = incommingCall;
         incommingCall.answer(myStream);
         mediaConnection.on("stream", mediaConnectionOnStream);
-      });
-    //} else {
-    //  console.log("notAnswered!");
-    //}
+      });    
   };
   //open the connection! and handles eventual error!
   peer.on("open", peerOnOpen);
@@ -175,7 +161,7 @@
 
   //display video of me!
   navigator.mediaDevices
-    .getUserMedia({ audio: true, video: true })
+    .getUserMedia({ audio: false, video: true })
     .then((stream) => {
       const video = document.querySelector(".video-container.me video");
 
